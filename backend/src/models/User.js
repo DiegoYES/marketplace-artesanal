@@ -9,13 +9,18 @@ const UserSchema = new mongoose.Schema({
     email: {
         type: String,
         required: true,
-        unique: true, // No puede haber dos usuarios con el mismo correo
+        unique: true,
         trim: true,
         lowercase: true
     },
     password: {
         type: String,
         required: true
+    },
+    rol: {
+        type: String,
+        enum: ['comprador', 'vendedor'], // Solo permite estos dos valores
+        default: 'comprador' // Si no eligen, son compradores por defecto
     },
     registro: {
         type: Date,

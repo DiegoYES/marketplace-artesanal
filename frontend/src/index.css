@@ -1,0 +1,70 @@
+/* --- ESTILOS GLOBALES --- */
+body {
+  margin: 0;
+  font-family: 'Poppins', sans-serif; /* Usamos la fuente nueva */
+  background-color: #f4f7f6; /* Fondo gris muy suave, elegante */
+  color: #333;
+  -webkit-font-smoothing: antialiased;
+}
+
+/* --- FORMULARIOS BONITOS --- */
+input, select, textarea {
+  width: 100%;
+  padding: 12px 15px;
+  margin: 8px 0;
+  display: inline-block;
+  border: 1px solid #ddd;
+  border-radius: 8px; /* Bordes redondeados */
+  box-sizing: border-box;
+  font-family: inherit;
+  transition: border-color 0.3s ease;
+}
+
+input:focus, select:focus, textarea:focus {
+  outline: none;
+  border-color: #61dafb; /* Azul React al escribir */
+  box-shadow: 0 0 5px rgba(97, 218, 251, 0.3);
+}
+
+/* --- BOTONES MODERNOS --- */
+button {
+  background-color: #282c34;
+  color: white;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-weight: 600;
+  transition: transform 0.1s ease, background-color 0.3s;
+  width: 100%;
+}
+
+button:hover {
+  background-color: #3e4452; /* Un poco más claro al pasar el mouse */
+  transform: translateY(-2px); /* Efecto de elevación */
+}
+
+button:active {
+  transform: translateY(0);
+}
+
+/* --- TARJETAS DE PRODUCTOS --- */
+/* Aunque usamos estilos en línea en el componente, esto ayuda */
+img {
+  max-width: 100%;
+  display: block;
+}
+
+h1, h2, h3 {
+  color: #1a1a1a;
+}
+
+/* --- ESTILO DEL LINK "VENDER" --- */
+a {
+  text-decoration: none;
+  transition: opacity 0.3s;
+}
+
+a:hover {
+  opacity: 0.8;
+}
