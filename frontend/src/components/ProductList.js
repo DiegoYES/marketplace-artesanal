@@ -11,21 +11,19 @@ import ChatComponent from './ChatComponent';
  * ------------------------------------------------------------------
  * Renderiza la grilla de artesanías disponibles.
  * Implementa lógica condicional para mostrar controles de Vendedor
- * o controles de Comprador según el dueño del ítem.
+ * o controles de Comprador según el dueño del ítem o rol de Admin.
  */
 const ProductList = () => {
-    // Estado Local: Lista de productos
     const [products, setProducts] = useState([]);
-    
-    // Estado Global: Usuario autenticado y Dispatch de Redux
     const dispatch = useDispatch();
+    
+    // Acceso al estado global de autenticación
     const { user } = useSelector((state) => state.auth);
 
     const API_URL = 'http://150.136.20.54:5000/api/products';
 
     /*
      * CARGA DE DATOS (READ)
-     * Obtiene el listado completo desde la API al montar el componente.
      */
     const fetchProducts = async () => {
         try {
@@ -42,8 +40,7 @@ const ProductList = () => {
 
     /*
      * ELIMINAR PRODUCTO (DELETE)
-     * Exclusivo para el vendedor dueño del ítem.
-     * Requiere confirmación y token de seguridad.
+     * Requiere token de seguridad.
      */
     const handleDelete = async (id) => {
         if (window.confirm('¿Estás seguro de eliminar esta publicación permanentemente?')) {
@@ -51,7 +48,6 @@ const ProductList = () => {
                 const config = { headers: { 'x-auth-token': user.token } };
                 await axios.delete(`${API_URL}/${id}`, config);
                 
-                // Recarga la lista para reflejar cambios
                 fetchProducts();
                 alert('Producto eliminado correctamente');
             } catch (error) { 
@@ -62,12 +58,10 @@ const ProductList = () => {
     };
 
     /*
-     * CARRITO DE COMPRAS (ACCIÓN LOCAL)
-     * Agrega el ítem al estado global de Redux.
+     * AGREGAR AL CARRITO
      */
     const handleAddToCart = (product) => {
         dispatch(addToCart(product));
-        // Feedback visual simple (podría ser un toast)
         alert(`${product.nombre} agregado al carrito 🛒`);
     };
 
@@ -77,7 +71,6 @@ const ProductList = () => {
                 📦 Marketplace Artesanal
             </h2>
             
-            {/* GRILLA RESPONSIVA DE PRODUCTOS */}
             <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(300px, 1fr))', gap: '30px' }}>
                 {products.map((product) => (
                     <div key={product._id} style={{ background: 'white', borderRadius: '15px', overflow: 'hidden', boxShadow: '0 10px 20px rgba(0,0,0,0.05)', display: 'flex', flexDirection: 'column', transition: 'transform 0.3s' }}>
@@ -94,7 +87,7 @@ const ProductList = () => {
                             </span>
                         </div>
                         
-                        {/* CONTENIDO DE LA TARJETA */}
+                        {/* CONTENIDO */}
                         <div style={{ padding: '20px', flex: '1', display: 'flex', flexDirection: 'column', justifyContent: 'space-between' }}>
                             <div>
                                 <h3 style={{ margin: '0 0 10px 0', fontSize: '1.3rem', color: '#34495e' }}>{product.nombre}</h3>
@@ -110,11 +103,16 @@ const ProductList = () => {
                                 </div>
 
                                 <div style={{ borderTop: '1px solid #eee', paddingTop: '15px' }}>
-                                    {/* * RENDERIZADO CONDICIONAL DE ROLES
-                                     * ¿El usuario logueado es el dueño del producto?
+                                    
+                                    {/* * LÓGICA DE PERMISOS:
+                                     * Se muestran controles de administración si:
+                                     * 1. El usuario tiene rol 'admin'.
+                                     * 2. El usuario es el creador del producto.
                                      */}
-                                    {user && product.creador && (user._id === product.creador._id || user.id === product.creador._id) ? (
-                                        // VISTA DE VENDEDOR (ADMINISTRACIÓN)
+                                    {user && (
+                                        (user.rol === 'admin') || 
+                                        (product.creador && (user._id === product.creador._id || user.id === product.creador._id))
+                                    ) ? (
                                         <div style={{ display: 'flex', gap: '10px' }}>
                                             <Link 
                                                 to={`/editar-producto/${product._id}`} 
@@ -131,7 +129,6 @@ const ProductList = () => {
                                             </button>
                                         </div>
                                     ) : (
-                                        // VISTA DE COMPRADOR
                                         <button 
                                             onClick={() => handleAddToCart(product)}
                                             style={{ width: '100%', background: '#3498db', color: 'white', padding: '12px', border: 'none', borderRadius: '6px', fontWeight: 'bold', cursor: 'pointer', fontSize: '1rem' }}
@@ -140,7 +137,7 @@ const ProductList = () => {
                                         </button>
                                     )}
 
-                                    {/* MÓDULO DE CHAT (Solo visible si hay usuario logueado) */}
+                                    {/* CHAT */}
                                     {user && (
                                         <div style={{ marginTop: '20px' }}>
                                             <ChatComponent room={product._id} username={user.nombre} />

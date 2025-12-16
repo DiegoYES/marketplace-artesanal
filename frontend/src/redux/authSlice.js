@@ -2,7 +2,7 @@ import { createSlice, createAsyncThunk } from '@reduxjs/toolkit';
 import axios from 'axios';
 
 // Configuración del Endpoint de Autenticación
-const API_URL = 'http://150.136.20.54:5000/api/products/auth/';
+const API_URL = 'http://150.136.20.54:5000/api/auth/';
 
 /*
  * ------------------------------------------------------------------
