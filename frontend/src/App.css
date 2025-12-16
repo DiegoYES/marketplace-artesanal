@@ -1,7 +1,18 @@
+/*
+ * ------------------------------------------------------------------
+ * ESTILOS GLOBALES DE LA APLICACIÓN
+ * ------------------------------------------------------------------
+ * Configuración base de alineación, colores y tipografía.
+ */
+
 .App {
   text-align: center;
 }
 
+/*
+ * CONFIGURACIÓN DEL LOGO (ANIMACIÓN)
+ * Define el comportamiento del logo giratorio (útil para loading).
+ */
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -13,6 +24,12 @@
   }
 }
 
+/*
+ * HEADER Y CONTENEDOR PRINCIPAL
+ * - min-height: 100vh -> Ocupa siempre toda la altura de la pantalla.
+ * - display: flex -> Centra el contenido vertical y horizontalmente.
+ * - color: white -> Texto blanco para contraste con fondo oscuro.
+ */
 .App-header {
   background-color: #282c34;
   min-height: 100vh;
@@ -24,10 +41,18 @@
   color: white;
 }
 
+/*
+ * ENLACES Y ACENTOS
+ * Color cyan (#61dafb) característico de React.
+ */
 .App-link {
   color: #61dafb;
 }
 
+/*
+ * KEYFRAMES DE ANIMACIÓN
+ * Rotación de 360 grados para el logo.
+ */
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);

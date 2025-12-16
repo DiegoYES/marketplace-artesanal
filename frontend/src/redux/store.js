@@ -1,11 +1,21 @@
 import { configureStore } from '@reduxjs/toolkit';
-// CAMBIO: Quitamos el "/redux/" porque ya estamos dentro de esa carpeta
 import authReducer from './authSlice'; 
 import cartReducer from './cartSlice';
 
+/*
+ * ------------------------------------------------------------------
+ * STORE (ALMACÉN GLOBAL)
+ * ------------------------------------------------------------------
+ * Configuración central de Redux.
+ * Combina los diferentes "slices" (rebanadas de estado) en una
+ * única fuente de verdad para toda la aplicación.
+ */
 export const store = configureStore({
-  reducer: {
-    auth: authReducer,
-    cart: cartReducer,
-  },
+    reducer: {
+        // Estado de sesión (Usuario, Token, Errores)
+        auth: authReducer,
+        
+        // Estado de compras (Items, Total)
+        cart: cartReducer,
+    },
 });

@@ -1,6 +1,12 @@
 const Product = require('../models/Product');
 
-// OBTENER todos los productos
+/*
+ * ------------------------------------------------------------------
+ * CONTROLADOR: OBTENER CATÁLOGO DE PRODUCTOS
+ * ------------------------------------------------------------------
+ * Recupera todos los productos de la base de datos.
+ * Utiliza .populate() para obtener el nombre del vendedor asociado.
+ */
 exports.getProducts = async (req, res) => {
     try {
         const products = await Product.find().populate('creador', 'nombre');
@@ -11,11 +17,17 @@ exports.getProducts = async (req, res) => {
     }
 };
 
-// CREAR un nuevo producto
+/*
+ * ------------------------------------------------------------------
+ * CONTROLADOR: CREAR NUEVO PRODUCTO
+ * ------------------------------------------------------------------
+ * Recibe los datos del formulario y asigna el ID del usuario
+ * autenticado como el 'creador' del producto.
+ */
 exports.createProduct = async (req, res) => {
     try {
         const newProduct = new Product(req.body);
-        newProduct.creador = req.user.id; 
+        newProduct.creador = req.user.id; // Vinculación Usuario-Producto
         await newProduct.save();
         res.json(newProduct);
     } catch (error) {
@@ -24,7 +36,13 @@ exports.createProduct = async (req, res) => {
     }
 };
 
-// EDITAR un producto
+/*
+ * ------------------------------------------------------------------
+ * CONTROLADOR: EDITAR PRODUCTO EXISTENTE
+ * ------------------------------------------------------------------
+ * Permite actualizar campos específicos.
+ * Incluye validación de seguridad: Solo el dueño puede editar.
+ */
 exports.updateProduct = async (req, res) => {
     try {
         const { nombre, descripcion, precio, categoria, imagenUrl, stock } = req.body;
@@ -35,6 +53,7 @@ exports.updateProduct = async (req, res) => {
             return res.status(404).json({ msg: 'Producto no encontrado' });
         }
 
+        // Verificación de Propiedad (Seguridad)
         if (product.creador.toString() !== req.user.id) {
             return res.status(401).json({ msg: 'No autorizado para editar este producto' });
         }
@@ -56,7 +75,13 @@ exports.updateProduct = async (req, res) => {
     }
 };
 
-// --- NUEVO: ELIMINAR PRODUCTO ---
+/*
+ * ------------------------------------------------------------------
+ * CONTROLADOR: ELIMINAR PRODUCTO
+ * ------------------------------------------------------------------
+ * Borra permanentemente un producto.
+ * Incluye validación de seguridad: Solo el dueño puede borrar.
+ */
 exports.deleteProduct = async (req, res) => {
     try {
         let product = await Product.findById(req.params.id);
@@ -65,15 +90,13 @@ exports.deleteProduct = async (req, res) => {
             return res.status(404).json({ msg: 'Producto no encontrado' });
         }
 
-        // Verificar dueño
+        // Verificación de Propiedad (Seguridad)
         if (product.creador.toString() !== req.user.id) {
             return res.status(401).json({ msg: 'No autorizado para eliminar este producto' });
         }
 
-        // Eliminar
         await Product.findByIdAndDelete(req.params.id);
-
-        res.json({ msg: 'Producto eliminado' });
+        res.json({ msg: 'Producto eliminado correctamente' });
 
     } catch (error) {
         console.error(error);

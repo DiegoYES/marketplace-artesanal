@@ -1,5 +1,14 @@
 const mongoose = require('mongoose');
 
+/*
+ * ------------------------------------------------------------------
+ * MODELO: PRODUCTO (ARTESANÍA)
+ * ------------------------------------------------------------------
+ * Define la estructura de los artículos en venta.
+ * - Validaciones: Precios no negativos, campos obligatorios.
+ * - Categorización: Lista cerrada (Enum) de tipos de artesanía.
+ * - Relación: Vinculación con el Usuario (Vendedor) vía ObjectId.
+ */
 const ProductSchema = new mongoose.Schema({
     nombre: {
         type: String,
@@ -18,11 +27,11 @@ const ProductSchema = new mongoose.Schema({
     categoria: {
         type: String,
         required: true,
-        enum: ['Textiles', 'Cerámica', 'Madera', 'Joyería', 'Pintura', 'Otros'] // Categorías fijas
+        enum: ['Textiles', 'Cerámica', 'Madera', 'Joyería', 'Pintura', 'Otros']
     },
     imagenUrl: {
         type: String,
-        default: 'https://via.placeholder.com/150' // Imagen por defecto si no suben una
+        default: 'https://via.placeholder.com/150'
     },
     stock: {
         type: Number,
@@ -31,7 +40,7 @@ const ProductSchema = new mongoose.Schema({
     },
     creador: {
         type: mongoose.Schema.Types.ObjectId,
-        ref: 'User' // Relación con el usuario (vendedor)
+        ref: 'User'
     },
     fechaCreacion: {
         type: Date,

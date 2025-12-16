@@ -2,6 +2,8 @@ import React from 'react';
 import { BrowserRouter as Router, Routes, Route, Link } from 'react-router-dom';
 import { useSelector, useDispatch } from 'react-redux';
 import { logout, reset } from './redux/authSlice';
+
+// Importación de Componentes (Vistas)
 import ProductList from './components/ProductList';
 import AddProduct from './components/AddProduct';
 import Register from './components/Register';
@@ -9,10 +11,12 @@ import Login from './components/Login';
 import EditProduct from './components/EditProduct';
 import CartScreen from './components/CartScreen';
 
+import './App.css';
+
 function App() {
   const dispatch = useDispatch();
   
-  // Traemos al usuario y al carrito desde Redux
+  // Suscripción a Estados Globales (Sesión y Carrito)
   const { user } = useSelector((state) => state.auth);
   const { cartItems } = useSelector((state) => state.cart); 
 
@@ -24,58 +28,81 @@ function App() {
   return (
     <Router>
       <div className="App">
-        {/* BARRA DE NAVEGACIÓN */}
-        <nav style={{ background: '#282c34', color: 'white', padding: '15px', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+        
+        {/* ------------------------------------------------------------------
+         * BARRA DE NAVEGACIÓN (NAVBAR)
+         * ------------------------------------------------------------------ */}
+        <nav style={{ background: '#2c3e50', color: 'white', padding: '15px 30px', display: 'flex', justifyContent: 'space-between', alignItems: 'center', boxShadow: '0 2px 5px rgba(0,0,0,0.2)' }}>
           
-          <Link to="/" style={{ color: 'white', textDecoration: 'none' }}>
-            <h1 style={{ margin: 0, fontSize: '1.5rem' }}>🎨 Marketplace Equipo K</h1>
+          {/* LOGOTIPO */}
+          <Link to="/" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '10px' }}>
+            <span style={{ fontSize: '1.8rem' }}>🎨</span>
+            <h1 style={{ margin: 0, fontSize: '1.5rem', fontWeight: 'bold' }}>Marketplace Equipo K</h1>
           </Link>
           
-          <div style={{ display: 'flex', alignItems: 'center', gap: '20px' }}>
+          {/* MENÚ DERECHO */}
+          <div style={{ display: 'flex', alignItems: 'center', gap: '25px' }}>
             
-            {/* --- AQUÍ ESTÁ EL ENLACE AL CARRITO --- */}
-            <Link to="/carrito" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '8px', fontSize: '1.1rem' }}>
+            {/* ÍCONO DE CARRITO (CON CONTADOR DINÁMICO) */}
+            <Link to="/carrito" style={{ color: 'white', textDecoration: 'none', display: 'flex', alignItems: 'center', gap: '5px', fontSize: '1.2rem', position: 'relative' }}>
                 🛒 
-                {/* Mostramos contador rojo si hay cosas */}
                 {cartItems.length > 0 && (
-                    <span style={{ background: '#e74c3c', color: 'white', borderRadius: '50%', padding: '2px 8px', fontSize: '0.8rem', fontWeight: 'bold' }}>
+                    <span style={{ 
+                        background: '#e74c3c', 
+                        color: 'white', 
+                        borderRadius: '50%', 
+                        padding: '2px 6px', 
+                        fontSize: '0.75rem', 
+                        fontWeight: 'bold',
+                        position: 'absolute',
+                        top: '-8px',
+                        right: '-10px',
+                        minWidth: '18px',
+                        textAlign: 'center'
+                    }}>
                         {cartItems.length}
                     </span>
                 )}
             </Link>
-            {/* -------------------------------------- */}
 
+            {/* LÓGICA DE USUARIO LOGUEADO VS INVITADO */}
             {user ? (
               <>
-                <span style={{ color: '#aaa', fontSize: '0.9rem' }}>
-                  Hola, {user.nombre} 
-                  <span style={{ background: '#444', padding: '2px 6px', borderRadius: '4px', marginLeft: '5px', fontSize: '0.7rem', textTransform: 'uppercase' }}>
-                    {user.rol}
-                  </span>
-                </span>
+                <div style={{ display: 'flex', flexDirection: 'column', alignItems: 'flex-end', marginRight: '10px' }}>
+                    <span style={{ fontSize: '0.95rem', fontWeight: 'bold' }}>{user.nombre}</span> 
+                    <span style={{ background: '#f1c40f', color: '#2c3e50', padding: '1px 6px', borderRadius: '4px', fontSize: '0.65rem', textTransform: 'uppercase', fontWeight: 'bold' }}>
+                      {user.rol}
+                    </span>
+                </div>
                 
-                <button onClick={onLogout} style={{ width: 'auto', background: 'transparent', border: '1px solid white', color: 'white', padding: '5px 10px', cursor: 'pointer', borderRadius: '4px', fontSize: '0.8rem' }}>
+                <button 
+                    onClick={onLogout} 
+                    style={{ background: 'transparent', border: '1px solid #bdc3c7', color: '#bdc3c7', padding: '6px 12px', cursor: 'pointer', borderRadius: '4px', fontSize: '0.85rem', transition: '0.3s' }}
+                >
                   Salir
                 </button>
 
-                {/* SOLO EL VENDEDOR VE ESTO */}
+                {/* BOTÓN EXCLUSIVO PARA VENDEDORES */}
                 {user.rol === 'vendedor' && (
-                  <Link to="/crear-producto" style={{ background: '#61dafb', color: 'black', padding: '8px 15px', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold' }}>
+                  <Link to="/crear-producto" style={{ background: '#61dafb', color: '#282c34', padding: '8px 15px', textDecoration: 'none', borderRadius: '4px', fontWeight: 'bold', border: '1px solid #61dafb' }}>
                     + Vender
                   </Link>
                 )}
               </>
             ) : (
+              // MENU PARA VISITANTES
               <>
-                <Link to="/registro" style={{ color: 'white', textDecoration: 'none', marginRight: '15px' }}>Registro</Link>
-                <Link to="/login" style={{ color: 'white', textDecoration: 'none' }}>Login</Link>
+                <Link to="/registro" style={{ color: '#ecf0f1', textDecoration: 'none', fontWeight: '500' }}>Registrarse</Link>
+                <Link to="/login" style={{ background: 'white', color: '#2c3e50', padding: '6px 15px', textDecoration: 'none', borderRadius: '20px', fontWeight: 'bold' }}>Login</Link>
               </>
             )}
 
           </div>
         </nav>
         
-        {/* RUTAS DE LA APP */}
+        {/* ------------------------------------------------------------------
+         * DEFINICIÓN DE RUTAS
+         * ------------------------------------------------------------------ */}
         <Routes>
           <Route path="/" element={<ProductList />} />
           <Route path="/crear-producto" element={<AddProduct />} />

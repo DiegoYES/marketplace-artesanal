@@ -1,24 +1,34 @@
 const jwt = require('jsonwebtoken');
 
+/*
+ * ------------------------------------------------------------------
+ * MIDDLEWARE DE AUTENTICACIÓN
+ * ------------------------------------------------------------------
+ * Intercepta las peticiones a rutas protegidas para verificar
+ * la identidad del usuario mediante JWT.
+ * * 1. Busca el token en el header 'x-auth-token'.
+ * 2. Verifica la firma criptográfica usando la clave secreta.
+ * 3. Inyecta el usuario decodificado en la petición (req.user).
+ */
 module.exports = function (req, res, next) {
-    // 1. Leer el token del header de la petición
-    // El estándar es mandarlo en un header llamado 'x-auth-token' o 'Authorization'
+    // Extracción del token del header
     const token = req.header('x-auth-token');
 
-    // 2. Revisar si no hay token
+    // Validación de existencia
     if (!token) {
-        return res.status(401).json({ msg: 'No hay token, permiso denegado' });
+        return res.status(401).json({ msg: 'Acceso denegado: No hay token de autorización' });
     }
 
-    // 3. Validar el token
+    // Verificación de integridad del token
     try {
-        // Verificamos que el token sea real usando la firma secreta
-        const cifrado = jwt.verify(token, process.env.JWT_SECRET);
+        const decoded = jwt.verify(token, process.env.JWT_SECRET);
         
-        // Si es válido, guardamos el usuario en la petición para usarlo después
-        req.user = cifrado.user;
-        next(); // Dejamos pasar a la siguiente función (el controlador)
+        // Inyección de usuario en la request para uso posterior
+        req.user = decoded.user;
+        
+        next(); // Continuar al siguiente middleware o controlador
+        
     } catch (error) {
-        res.status(401).json({ msg: 'Token no válido' });
+        res.status(401).json({ msg: 'Token no válido o expirado' });
     }
 };

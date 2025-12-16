@@ -1,5 +1,15 @@
 const mongoose = require('mongoose');
 
+/*
+ * ------------------------------------------------------------------
+ * MODELO: ORDEN DE COMPRA
+ * ------------------------------------------------------------------
+ * Estructura para registrar transacciones finalizadas.
+ * - usuario: Referencia al cliente que realizó la compra.
+ * - items: Arreglo de sub-documentos con detalles de los productos.
+ * - total: Monto final de la transacción.
+ * - estado: Status del pedido (Ej. Pagado, Pendiente).
+ */
 const OrderSchema = new mongoose.Schema({
     usuario: {
         type: mongoose.Schema.Types.ObjectId,
@@ -8,9 +18,19 @@ const OrderSchema = new mongoose.Schema({
     },
     items: [
         {
-            nombre: { type: String, required: true },
-            cantidad: { type: Number, required: true, default: 1 },
-            precio: { type: Number, required: true },
+            nombre: { 
+                type: String, 
+                required: true 
+            },
+            cantidad: { 
+                type: Number, 
+                required: true, 
+                default: 1 
+            },
+            precio: { 
+                type: Number, 
+                required: true 
+            },
             producto: {
                 type: mongoose.Schema.Types.ObjectId,
                 ref: 'Product',
@@ -24,7 +44,7 @@ const OrderSchema = new mongoose.Schema({
     },
     estado: {
         type: String,
-        default: 'Pagado', // Para simplificar, asumimos que pagan al instante
+        default: 'Pagado'
     },
     fecha: {
         type: Date,

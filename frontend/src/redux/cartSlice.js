@@ -1,6 +1,12 @@
 import { createSlice } from '@reduxjs/toolkit';
 
-// Intentamos leer el carrito del almacenamiento local por si refrescan la página
+/*
+ * ------------------------------------------------------------------
+ * ESTADO INICIAL Y PERSISTENCIA
+ * ------------------------------------------------------------------
+ * Intentamos recuperar el carrito del LocalStorage del navegador
+ * para evitar que los datos se pierdan al recargar la página.
+ */
 const cartFromStorage = localStorage.getItem('cart') 
   ? JSON.parse(localStorage.getItem('cart')) 
   : [];
@@ -11,29 +17,43 @@ const cartSlice = createSlice({
     cartItems: cartFromStorage, 
   },
   reducers: {
+    /*
+     * ACCIÓN: AGREGAR AL CARRITO
+     * Verifica duplicados y actualiza el almacenamiento local.
+     */
     addToCart: (state, action) => {
       const item = action.payload;
-      // Verificamos si ya existe el producto en el carrito
+      
+      // Verificamos existencia previa del producto
       const existItem = state.cartItems.find((x) => x._id === item._id);
 
       if (existItem) {
-        // Si ya existe, actualizamos (por ejemplo si cambiara la cantidad)
+        // Si existe, actualizamos el objeto (útil para cambios de precio/datos)
         state.cartItems = state.cartItems.map((x) =>
           x._id === existItem._id ? item : x
         );
       } else {
-        // Si no existe, lo agregamos
+        // Si es nuevo, lo añadimos al array
         state.cartItems = [...state.cartItems, item];
       }
 
-      // Guardamos en el navegador para no perderlo al recargar
+      // Sincronización con LocalStorage
       localStorage.setItem('cart', JSON.stringify(state.cartItems));
     },
+
+    /*
+     * ACCIÓN: ELIMINAR DEL CARRITO
+     * Filtra el array excluyendo el ID seleccionado.
+     */
     removeFromCart: (state, action) => {
-      // Filtramos para quitar el producto que tenga ese ID
       state.cartItems = state.cartItems.filter((x) => x._id !== action.payload);
       localStorage.setItem('cart', JSON.stringify(state.cartItems));
     },
+
+    /*
+     * ACCIÓN: VACIAR CARRITO
+     * Limpieza total tras una compra exitosa o logout.
+     */
     clearCart: (state) => {
       state.cartItems = [];
       localStorage.removeItem('cart');

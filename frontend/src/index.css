@@ -1,65 +1,100 @@
-/* --- ESTILOS GLOBALES --- */
+/* * IMPORTACIÓN DE FUENTES
+ * Traemos 'Poppins' desde Google Fonts para una tipografía moderna.
+ */
+@import url('https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap');
+
+/*
+ * ------------------------------------------------------------------
+ * ESTILOS BASE (RESET & TYPOGRAPHY)
+ * ------------------------------------------------------------------
+ */
 body {
   margin: 0;
-  font-family: 'Poppins', sans-serif; /* Usamos la fuente nueva */
-  background-color: #f4f7f6; /* Fondo gris muy suave, elegante */
+  font-family: 'Poppins', sans-serif;
+  background-color: #f4f7f6; /* Gris muy suave para reducir fatiga visual */
   color: #333;
   -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
 }
 
-/* --- FORMULARIOS BONITOS --- */
+code {
+  font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New', monospace;
+}
+
+/*
+ * ------------------------------------------------------------------
+ * FORMULARIOS MODERNOS
+ * ------------------------------------------------------------------
+ * Estilizado de inputs para mejorar la experiencia de usuario (UX).
+ */
 input, select, textarea {
   width: 100%;
   padding: 12px 15px;
   margin: 8px 0;
   display: inline-block;
   border: 1px solid #ddd;
-  border-radius: 8px; /* Bordes redondeados */
+  border-radius: 8px;
   box-sizing: border-box;
   font-family: inherit;
-  transition: border-color 0.3s ease;
+  font-size: 1rem;
+  transition: border-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Feedback visual al escribir (Focus) */
 input:focus, select:focus, textarea:focus {
   outline: none;
-  border-color: #61dafb; /* Azul React al escribir */
-  box-shadow: 0 0 5px rgba(97, 218, 251, 0.3);
+  border-color: #61dafb; /* Azul React */
+  box-shadow: 0 0 0 3px rgba(97, 218, 251, 0.2);
 }
 
-/* --- BOTONES MODERNOS --- */
+/*
+ * ------------------------------------------------------------------
+ * BOTONES INTERACTIVOS
+ * ------------------------------------------------------------------
+ */
 button {
-  background-color: #282c34;
+  background-color: #2c3e50;
   color: white;
   padding: 12px 20px;
   border: none;
   border-radius: 8px;
   cursor: pointer;
   font-weight: 600;
-  transition: transform 0.1s ease, background-color 0.3s;
+  font-size: 1rem;
   width: 100%;
+  
+  /* Animación suave */
+  transition: transform 0.1s ease, background-color 0.3s ease, box-shadow 0.3s ease;
 }
 
+/* Micro-interacción: Elevación al pasar el mouse */
 button:hover {
-  background-color: #3e4452; /* Un poco más claro al pasar el mouse */
-  transform: translateY(-2px); /* Efecto de elevación */
+  background-color: #34495e;
+  transform: translateY(-2px);
+  box-shadow: 0 4px 8px rgba(0,0,0,0.1);
 }
 
+/* Efecto de click */
 button:active {
   transform: translateY(0);
+  box-shadow: none;
 }
 
-/* --- TARJETAS DE PRODUCTOS --- */
-/* Aunque usamos estilos en línea en el componente, esto ayuda */
+/*
+ * ------------------------------------------------------------------
+ * UTILIDADES VISUALES
+ * ------------------------------------------------------------------
+ */
 img {
   max-width: 100%;
   display: block;
 }
 
-h1, h2, h3 {
-  color: #1a1a1a;
+h1, h2, h3, h4 {
+  color: #2c3e50;
+  margin-top: 0;
 }
 
-/* --- ESTILO DEL LINK "VENDER" --- */
 a {
   text-decoration: none;
   transition: opacity 0.3s;
