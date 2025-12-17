@@ -1,11 +1,12 @@
 const Product = require('../models/Product');
+const User = require('../models/User');
 
 /*
  * ------------------------------------------------------------------
- * CONTROLADOR: OBTENER CATÁLOGO DE PRODUCTOS
+ * OBTENER TODOS LOS PRODUCTOS
  * ------------------------------------------------------------------
- * Recupera todos los productos de la base de datos.
- * Utiliza .populate() para obtener el nombre del vendedor asociado.
+ * Retorna el catálogo completo.
+ * Incluye los datos del usuario creador (nombre) usando populate.
  */
 exports.getProducts = async (req, res) => {
     try {
@@ -19,10 +20,10 @@ exports.getProducts = async (req, res) => {
 
 /*
  * ------------------------------------------------------------------
- * CONTROLADOR: CREAR NUEVO PRODUCTO
+ * CREAR UN PRODUCTO
  * ------------------------------------------------------------------
- * Recibe los datos del formulario y asigna el ID del usuario
- * autenticado como el 'creador' del producto.
+ * Guarda un nuevo producto en la base de datos.
+ * Asigna automáticamente al usuario autenticado como creador.
  */
 exports.createProduct = async (req, res) => {
     try {
@@ -38,36 +39,34 @@ exports.createProduct = async (req, res) => {
 
 /*
  * ------------------------------------------------------------------
- * CONTROLADOR: EDITAR PRODUCTO EXISTENTE
+ * EDITAR PRODUCTO (CON VERIFICACIÓN EN TIEMPO REAL)
  * ------------------------------------------------------------------
- * Permite actualizar campos específicos.
- * Validación de seguridad: 
- * - Permite editar si el usuario es el Creador (Dueño).
- * - Permite editar si el usuario es Admin (Superusuario).
+ * Actualiza la información de un producto existente.
+ * Consulta la base de datos para verificar si el usuario es Admin
+ * o el dueño original, garantizando permisos actualizados.
  */
 exports.updateProduct = async (req, res) => {
     try {
         const { nombre, descripcion, precio, categoria, imagenUrl, stock } = req.body;
         
+        // Buscar el producto objetivo
         let product = await Product.findById(req.params.id);
-
         if (!product) {
             return res.status(404).json({ msg: 'Producto no encontrado' });
         }
 
-        // --- LÓGICA DE PERMISOS SUPERIOR ---
-        // 1. Verificación de Rol Admin
-        const esAdmin = req.user.rol === 'admin';
+        // Consultar el usuario actual en la BD para obtener su rol real
+        const userDb = await User.findById(req.user.id);
         
-        // 2. Verificación de Propiedad (Dueño)
-        // Se valida que product.creador exista para evitar errores en productos antiguos
+        // Validación de permisos (Admin Global o Dueño del producto)
+        const esAdmin = userDb.rol === 'admin';
         const esDuenio = product.creador && product.creador.toString() === req.user.id;
 
-        // Si NO es Admin Y TAMPOCO es el dueño -> Error 401
         if (!esAdmin && !esDuenio) {
             return res.status(401).json({ msg: 'No autorizado para editar este producto' });
         }
 
+        // Construir objeto con los nuevos datos
         const nuevoProducto = {};
         if (nombre) nuevoProducto.nombre = nombre;
         if (descripcion) nuevoProducto.descripcion = descripcion;
@@ -76,7 +75,7 @@ exports.updateProduct = async (req, res) => {
         if (imagenUrl) nuevoProducto.imagenUrl = imagenUrl;
         if (stock) nuevoProducto.stock = stock;
 
-        // new: true devuelve el producto ya actualizado para reflejarlo en el frontend
+        // Actualizar y retornar el nuevo documento
         product = await Product.findByIdAndUpdate(req.params.id, { $set: nuevoProducto }, { new: true });
         res.json(product);
 
@@ -88,28 +87,25 @@ exports.updateProduct = async (req, res) => {
 
 /*
  * ------------------------------------------------------------------
- * CONTROLADOR: ELIMINAR PRODUCTO
+ * ELIMINAR PRODUCTO (CON VERIFICACIÓN EN TIEMPO REAL)
  * ------------------------------------------------------------------
- * Borra permanentemente un producto.
- * Validación de seguridad: 
- * - Permite el borrado si el usuario es el Creador.
- * - Permite el borrado si el usuario es Admin (Superusuario).
+ * Elimina un producto de la base de datos.
+ * Requiere permisos de Administrador o ser el creador del ítem.
  */
 exports.deleteProduct = async (req, res) => {
     try {
         let product = await Product.findById(req.params.id);
-
         if (!product) {
             return res.status(404).json({ msg: 'Producto no encontrado' });
         }
 
-        // 1. Verificación de Rol Admin
-        const esAdmin = req.user.rol === 'admin';
+        // Consultar el usuario actual en la BD para obtener su rol real
+        const userDb = await User.findById(req.user.id);
 
-        // 2. Verificación de Propiedad (Dueño)
+        // Validación de permisos
+        const esAdmin = userDb.rol === 'admin';
         const esDuenio = product.creador && product.creador.toString() === req.user.id;
 
-        // Si no cumple ninguna de las dos condiciones, se rechaza
         if (!esAdmin && !esDuenio) {
             return res.status(401).json({ msg: 'No autorizado para eliminar este producto' });
         }
