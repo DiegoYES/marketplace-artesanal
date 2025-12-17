@@ -27,7 +27,7 @@ exports.getProducts = async (req, res) => {
 exports.createProduct = async (req, res) => {
     try {
         const newProduct = new Product(req.body);
-        newProduct.creador = req.user.id; // Vinculación Usuario-Producto
+        newProduct.creador = req.user.id; 
         await newProduct.save();
         res.json(newProduct);
     } catch (error) {
@@ -41,7 +41,9 @@ exports.createProduct = async (req, res) => {
  * CONTROLADOR: EDITAR PRODUCTO EXISTENTE
  * ------------------------------------------------------------------
  * Permite actualizar campos específicos.
- * Incluye validación de seguridad: Solo el dueño puede editar.
+ * Validación de seguridad: 
+ * - Permite editar si el usuario es el Creador (Dueño).
+ * - Permite editar si el usuario es Admin (Superusuario).
  */
 exports.updateProduct = async (req, res) => {
     try {
@@ -53,8 +55,16 @@ exports.updateProduct = async (req, res) => {
             return res.status(404).json({ msg: 'Producto no encontrado' });
         }
 
-        // Verificación de Propiedad (Seguridad)
-        if (product.creador.toString() !== req.user.id) {
+        // --- LÓGICA DE PERMISOS SUPERIOR ---
+        // 1. Verificación de Rol Admin
+        const esAdmin = req.user.rol === 'admin';
+        
+        // 2. Verificación de Propiedad (Dueño)
+        // Se valida que product.creador exista para evitar errores en productos antiguos
+        const esDuenio = product.creador && product.creador.toString() === req.user.id;
+
+        // Si NO es Admin Y TAMPOCO es el dueño -> Error 401
+        if (!esAdmin && !esDuenio) {
             return res.status(401).json({ msg: 'No autorizado para editar este producto' });
         }
 
@@ -66,6 +76,7 @@ exports.updateProduct = async (req, res) => {
         if (imagenUrl) nuevoProducto.imagenUrl = imagenUrl;
         if (stock) nuevoProducto.stock = stock;
 
+        // new: true devuelve el producto ya actualizado para reflejarlo en el frontend
         product = await Product.findByIdAndUpdate(req.params.id, { $set: nuevoProducto }, { new: true });
         res.json(product);
 
@@ -80,7 +91,9 @@ exports.updateProduct = async (req, res) => {
  * CONTROLADOR: ELIMINAR PRODUCTO
  * ------------------------------------------------------------------
  * Borra permanentemente un producto.
- * Incluye validación de seguridad: Solo el dueño puede borrar.
+ * Validación de seguridad: 
+ * - Permite el borrado si el usuario es el Creador.
+ * - Permite el borrado si el usuario es Admin (Superusuario).
  */
 exports.deleteProduct = async (req, res) => {
     try {
@@ -90,8 +103,14 @@ exports.deleteProduct = async (req, res) => {
             return res.status(404).json({ msg: 'Producto no encontrado' });
         }
 
-        // Verificación de Propiedad (Seguridad)
-        if (product.creador.toString() !== req.user.id) {
+        // 1. Verificación de Rol Admin
+        const esAdmin = req.user.rol === 'admin';
+
+        // 2. Verificación de Propiedad (Dueño)
+        const esDuenio = product.creador && product.creador.toString() === req.user.id;
+
+        // Si no cumple ninguna de las dos condiciones, se rechaza
+        if (!esAdmin && !esDuenio) {
             return res.status(401).json({ msg: 'No autorizado para eliminar este producto' });
         }
 

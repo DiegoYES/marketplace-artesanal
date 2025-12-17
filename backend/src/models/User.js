@@ -6,8 +6,8 @@ const mongoose = require('mongoose');
  * ------------------------------------------------------------------
  * Define la estructura de las cuentas de acceso.
  * - email: Debe ser único en todo el sistema.
- * - rol: Define los permisos (ACL). Restringido estrictamente a:
- * 'comprador' (Default) o 'vendedor'.
+ * - rol: Define los permisos (ACL). 
+ * Valores permitidos: 'comprador', 'vendedor', 'admin'.
  */
 const UserSchema = new mongoose.Schema({
     nombre: {
@@ -28,7 +28,7 @@ const UserSchema = new mongoose.Schema({
     },
     rol: {
         type: String,
-        enum: ['comprador', 'vendedor'],
+        enum: ['comprador', 'vendedor', 'admin'],
         default: 'comprador'
     },
     registro: {
